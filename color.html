@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Main color</title>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="color-thief.js"></script>
+
+	<style>
+		#screenshot {
+			border: 1px solid #000;
+			margin-top: 2em;
+		}
+
+		#myButton:hover {
+			cursor: pointer;
+		}
+
+		.paletteCol {
+			width: 150px;
+			height: 150px;
+			border: 1px solid #000;
+			margin-right: 2em;
+			float: left;
+		}
+
+		#controls {
+			clear: both;
+		}
+	</style>
+</head>
+
+<body>
+<div id="wrapper">
+	<h3>Main color:</h3>
+
+	<div id="mainCol" style="width: 150px; height: 150px; border: 1px solid #000;"></div>
+
+	<h3>Palette:</h3>
+	<div id="paletteCols">
+	</div>
+
+	<div id="controls">
+		<label for="websiteUrl">URL: </label>
+		<input id="websiteUrl" name="websiteUrl" type="text" />
+		<a id="myButton">Do the magic!</a>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(function() {
+
+		function getColor(url) {
+
+			function removeOldScreenshot() {
+				if ($("#screenshot")) {
+					$("#screenshot").remove();
+				}
+			}
+
+			function removeOldPaletteColors() {
+				if ($("#paletteCols").children().length > 0) {
+					while ($("#paletteCols").children().length > 0) {
+						($("#paletteCols").children())[0].remove();
+					}
+				}
+			}
+
+			removeOldScreenshot();
+			removeOldPaletteColors();
+
+			var img = new Image;
+			var src = "http://192.168.0.12:8891/?url=" + url;
+
+			img.src = src;
+			img.setAttribute('id', 'screenshot');
+			img.crossOrigin = "Anonymous";
+
+			function Rgb(r, g, b) {
+				return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+			}
+
+			img.onload = function() {
+				var colorThief = new ColorThief();
+				var col = colorThief.getColor(img);
+				//console.log(col);
+				var mainCol = Rgb(col[0], col[1], col[2]);
+				//console.log(mainCol);
+
+				var pal = colorThief.getPalette(img, 5);
+				var palContainer = $("#paletteCols");
+				//console.log(pal);
+				var palArr = [];
+				for (var i = 0; i < 5; i++) {
+					palArr[i] = Rgb(pal[i][0], pal[i][1], pal[i][2]);
+					//console.log("arr: "+palArr[i]);
+
+					var div = document.createElement("div");
+
+					div.setAttribute('style', 'background-color:' + palArr[i]);
+					var counter = i + 1;
+					div.setAttribute('id', 'paletteCol_' + counter);
+					div.setAttribute('class', 'paletteCol');
+
+					palContainer.append(div);
+				}
+
+				$("#mainCol").css("background-color", mainCol);
+
+				$("#wrapper").append(img);
+			};
+		}
+
+		$("#myButton").on("click", function() {
+			var myUrl = $("#websiteUrl").val();
+			getColor(myUrl);
+		});
+
+	});
+</script>
+
+</body>
+
+</html>
