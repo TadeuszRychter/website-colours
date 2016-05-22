@@ -1,4 +1,4 @@
-This is code to an article ["How to get colours of a website?"](http://blog.fullystacked.it/how-to-get-colours-of-a-website/).
+This is code to an article ["How to get colours of a website?"](http://blog.fullystacked.it/how-to-get-colours-of-a-website).
 
 --------
 
